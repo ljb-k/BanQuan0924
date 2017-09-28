@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="#FFFFFF"
     tools:context="com.banquan.ljb.banquan0924.LoginActivity">
 
     <ImageView
@@ -28,13 +29,13 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="40dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:text="账号:"/>
             <EditText
                 android:id="@+id/accounts"
-                android:layout_width="300dp"
+                android:layout_width="280dp"
                 android:layout_height="50dp"
                 />
 
@@ -46,14 +47,14 @@
             android:orientation="horizontal">
 
             <TextView
-                android:layout_width="40dp"
+                android:layout_width="60dp"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
                 android:text="密码:"
                 />
             <EditText
                 android:id="@+id/password"
-                android:layout_width="300dp"
+                android:layout_width="280dp"
                 android:layout_height="50dp"
                 />
 
@@ -70,7 +71,7 @@
 
         <Button
             android:id="@+id/login"
-            android:layout_width="342dp"
+            android:layout_width="340dp"
             android:layout_height="50dp"
             android:text="登录"
             android:textSize="20sp"
@@ -90,7 +91,7 @@
                 android:layout_height="wrap_content"
                 android:text="没有账号？"/>
             <TextView
-                android:id="@+id/regist_Text"
+                android:id="@+id/register_Text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize="16sp"
