@@ -9,7 +9,12 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import java.util.List;
+
+import cn.bmob.v3.Bmob;
+import cn.bmob.v3.BmobQuery;
 import cn.bmob.v3.exception.BmobException;
+import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 
 public class RegisterActivity extends AppCompatActivity implements RegisterView{
@@ -20,11 +25,16 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     private EditText edt_reg_password;
     private Button btn_register;
     private ProgressDialog mProgressDialog;
+    private String reg_identity;
+    private  String reg_account;
+    private String reg_password;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+        Bmob.initialize(this, "e9730bea7f047ed30463895c16f14c46");
 
         initView();
 
@@ -49,17 +59,38 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     }
 
     private void register() {
-        String reg_identity;
+
         if(radioButton_stu.isChecked()==true){
             reg_identity="1";
         }else{
             reg_identity="0";
         }
 
-        String reg_account = edt_reg_account.getText().toString().trim();
-        String reg_password = edt_reg_password.getText().toString().trim();
+        reg_account = edt_reg_account.getText().toString().trim();
+        reg_password = edt_reg_password.getText().toString().trim();
+
+        BmobQuery<User> query_account = new BmobQuery<User>();
+        query_account.addWhereEqualTo("account",reg_account);
+        query_account.findObjects(new FindListener<User>() {
+            @Override
+            public void done(List<User> list, BmobException e) {
+                if(list.isEmpty() == true){
+                    registerToBomb();
+                }else {
+                    showUserExistDialog();
+                }
+            }
+        });
 
 
+
+    }
+
+    private void showUserExistDialog() {
+        Toast.makeText(this,"账号已经存在",Toast.LENGTH_SHORT).show();
+    }
+
+    private void registerToBomb() {
         User user = new User();
         user.setIdentity(reg_identity);
         user.setAccount(reg_account);
