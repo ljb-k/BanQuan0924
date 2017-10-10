@@ -1,6 +1,7 @@
 package com.banquan.ljb.banquan0924;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -61,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     private void register() {
 
         if(radioButton_stu.isChecked()==true){
-            reg_identity="1";
+            reg_identity="1";//1代表学生   0代表管理员
         }else{
             reg_identity="0";
         }
@@ -69,21 +70,31 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
         reg_account = edt_reg_account.getText().toString().trim();
         reg_password = edt_reg_password.getText().toString().trim();
 
-        BmobQuery<User> query_account = new BmobQuery<User>();
-        query_account.addWhereEqualTo("account",reg_account);
-        query_account.findObjects(new FindListener<User>() {
-            @Override
-            public void done(List<User> list, BmobException e) {
-                if(list.isEmpty() == true){
-                    registerToBomb();
-                }else {
-                    showUserExistDialog();
+        if(reg_account.length()>0 && reg_password.length()>0){
+            BmobQuery<User> query_account = new BmobQuery<User>();
+            query_account.addWhereEqualTo("account",reg_account);
+            query_account.findObjects(new FindListener<User>() {
+                @Override
+                public void done(List<User> list, BmobException e) {
+                    if(list.isEmpty() == true){
+                        registerToBomb();
+                    }else {
+                        showUserExistDialog();
+                    }
                 }
-            }
-        });
+            });
+        }else{
+            showTextLengthMustMoreThanZeroDialog();
+        }
 
 
 
+
+
+    }
+
+    private void showTextLengthMustMoreThanZeroDialog() {
+        Toast.makeText(this,"账号和密码长度必须大于0",Toast.LENGTH_SHORT).show();
     }
 
     private void showUserExistDialog() {
@@ -112,7 +123,8 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
 
     @Override
     public void onRegisterSuccess() {
-        Toast.makeText(this,"注册成功",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
+        goTo(LoginActivity.class);
     }
 
     @Override
@@ -141,5 +153,11 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
         mProgressDialog.setMessage("正在注册...");
         mProgressDialog.show();
 
+    }
+
+    public void goTo(Class activity) {
+        Intent intent = new Intent(this, activity);
+        startActivity(intent);
+        finish();
     }
 }
