@@ -4,6 +4,7 @@ import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -27,7 +28,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     private Button btn_register;
     private ProgressDialog mProgressDialog;
     private String reg_identity;
-    private  String reg_account;
+    private String reg_account;
     private String reg_password;
 
 
@@ -72,7 +73,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
 
         if(reg_account.length()>0 && reg_password.length()>0){
             BmobQuery<User> query_account = new BmobQuery<User>();
-            query_account.addWhereEqualTo("account",reg_account);
+            query_account.addWhereEqualTo("username",reg_account);
             query_account.findObjects(new FindListener<User>() {
                 @Override
                 public void done(List<User> list, BmobException e) {
@@ -104,20 +105,25 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     private void registerToBomb() {
         User user = new User();
         user.setIdentity(reg_identity);
-        user.setAccount(reg_account);
+        user.setUsername(reg_account);
         user.setPassword(reg_password);
+        user.signUp(new SaveListener<User>() {
 
-        user.save(new SaveListener<String>() {
             @Override
-            public void done(String s, BmobException e) {
+            public void done(User user, BmobException e) {
                 if(e == null){
                     onRegisterSuccess();
+                    finish();
                 }else {
                     onRegisterFailed();
+                    Log.e("注册",e.toString());
 
                 }
             }
+
+
         });
+
     }
 
 
