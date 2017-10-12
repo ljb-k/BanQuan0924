@@ -11,6 +11,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
+import com.hyphenate.chat.EMClient;
+
 import java.util.List;
 
 import cn.bmob.v3.Bmob;
@@ -36,7 +38,9 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
+
         Bmob.initialize(this, "e9730bea7f047ed30463895c16f14c46");
+
 
         initView();
 

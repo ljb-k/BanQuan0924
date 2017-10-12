@@ -19,6 +19,13 @@ public class User extends BmobUser{
         this.identity = identity;
     }
 
+    @Override
+    public void setUsername(String username) {
+        super.setUsername(username);
+    }
 
-
+    @Override
+    public void setPassword(String password) {
+        super.setPassword(password);
+    }
 }
