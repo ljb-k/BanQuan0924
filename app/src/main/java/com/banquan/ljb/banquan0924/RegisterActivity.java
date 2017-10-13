@@ -12,6 +12,8 @@ import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.hyphenate.chat.EMClient;
+import com.hyphenate.chat.EMOptions;
+import com.hyphenate.exceptions.HyphenateException;
 
 import java.util.List;
 
@@ -21,7 +23,7 @@ import cn.bmob.v3.exception.BmobException;
 import cn.bmob.v3.listener.FindListener;
 import cn.bmob.v3.listener.SaveListener;
 
-public class RegisterActivity extends AppCompatActivity implements RegisterView{
+public class RegisterActivity extends AppCompatActivity{
 
     private RadioButton radioButton_stu;
     private RadioButton radioButton_manager;
@@ -39,11 +41,32 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        Bmob.initialize(this, "e9730bea7f047ed30463895c16f14c46");
-
-
+        initTOBmob();
+        initHuanXin();
         initView();
 
+    }
+
+    private void initHuanXin() {
+        EMOptions options = new EMOptions();
+// 默认添加好友时，是不需要验证的，改成需要验证
+        options.setAcceptInvitationAlways(false);
+        int pid = android.os.Process.myPid();
+
+// 如果APP启用了远程的service，此application:onCreate会被调用2次
+// 为了防止环信SDK被初始化2次，加此判断会保证SDK被初始化1次
+// 默认的APP会在以包名为默认的process name下运行，如果查到的process name不是APP的process name就立即返回
+
+//初始化
+        EMClient.getInstance().init(getApplicationContext(), options);
+//在做打包混淆时，关闭debug模式，避免消耗不必要的资源
+        if (BuildConfig.DEBUG) {
+            EMClient.getInstance().setDebugMode(true);
+        }
+    }
+
+    private void initTOBmob() {
+        Bmob.initialize(this, "e9730bea7f047ed30463895c16f14c46");
     }
 
     private void initView() {
@@ -82,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
                 @Override
                 public void done(List<User> list, BmobException e) {
                     if(list.isEmpty() == true){
-                        registerToBomb();
+                        registerToBomb();//注册到bmob
                     }else {
                         showUserExistDialog();
                     }
@@ -116,7 +139,7 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
             @Override
             public void done(User user, BmobException e) {
                 if(e == null){
-                    onRegisterSuccess();
+                    registerToEaseMob();//注册到环信
                     finish();
                 }else {
                     onRegisterFailed();
@@ -130,40 +153,46 @@ public class RegisterActivity extends AppCompatActivity implements RegisterView{
 
     }
 
+    private void registerToEaseMob() {
+        ThreadUtils.runOnBackgroundThread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    EMClient.getInstance().createAccount(reg_account, reg_password);
+                    ThreadUtils.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onRegisterSuccess();
 
-    @Override
+                        }
+                    });
+                } catch (HyphenateException e) {
+                    e.printStackTrace();
+                    ThreadUtils.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            onRegisterFailed();
+
+                        }
+                    });
+                }
+            }
+        });
+
+
+    }
+
+
     public void onRegisterSuccess() {
         Toast.makeText(this, "注册成功", Toast.LENGTH_SHORT).show();
         goTo(LoginActivity.class);
     }
 
-    @Override
     public void onRegisterFailed() {
         Toast.makeText(this,"注册失败",Toast.LENGTH_SHORT).show();
 
     }
 
-    @Override
-    public void onAccountError() {
-
-    }
-
-    @Override
-    public void onPasswordError() {
-
-    }
-
-
-    @Override
-    public void onStartRegister() {
-
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-        }
-        mProgressDialog.setMessage("正在注册...");
-        mProgressDialog.show();
-
-    }
 
     public void goTo(Class activity) {
         Intent intent = new Intent(this, activity);
